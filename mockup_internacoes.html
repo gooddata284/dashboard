@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mockup – Internações e Reinternações</title>
+  <style>
+    :root {
+      --bg: #0b1020;           /* fundo escuro moderno */
+      --fg: #eef2f7;           /* texto principal */
+      --muted: #9aa4b2;        /* texto secundário */
+      --card: #121a30;         /* cartões */
+      --card-2: #0f172a;       /* cartões alternativos */
+      --grid: #1e293b;         /* linhas do grid */
+      --blue: #3b82f6;         /* internações */
+      --green: #10b981;        /* reinternações */
+      --amber: #f59e0b;        /* % reinternação */
+      --ok: #16a34a;           /* bom */
+      --warn: #f59e0b;         /* atenção */
+      --crit: #ef4444;         /* crítico */
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; background: var(--bg); color: var(--fg); font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; display: grid; gap: 16px; }
+    header { display: flex; gap: 16px; align-items: baseline; justify-content: space-between; }
+    h1 { font-size: 20px; margin:0; }
+    .sub { color: var(--muted); font-size: 13px; }
+
+    /* KPIs */
+    .kpis { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+    .card { background: linear-gradient(180deg, var(--card), var(--card-2)); border: 1px solid #0b1224; border-radius: 16px; padding: 16px; }
+    .kpi { grid-column: span 4; display: grid; gap: 8px; }
+    .kpi .title { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    .kpi .value { font-size: 28px; font-weight: 700; display: flex; align-items: baseline; gap: 8px; }
+    .badge { font-size: 12px; padding: 2px 8px; border-radius: 999px; border:1px solid #1f2937; }
+    .ok    { background: color-mix(in srgb, var(--ok) 15%, transparent); color: #b7f7c8; }
+    .warn  { background: color-mix(in srgb, var(--warn) 15%, transparent); color: #ffe2a9; }
+    .crit  { background: color-mix(in srgb, var(--crit) 15%, transparent); color: #ffc4c4; }
+    .spark { height: 42px; }
+
+    /* Grid principal */
+    .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } .kpi { grid-column: span 12; } }
+
+    /* Títulos */
+    h3 { margin: 0 0 8px; font-size: 16px; }
+    .legend { font-size: 12px; color: var(--muted); display:flex; gap:12px; align-items:center; }
+    .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+    .dot.blue { background: var(--blue); }
+    .dot.green { background: var(--green); }
+    .dot.amber { background: var(--amber); }
+
+    /* Tabela */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th { text-align:left; color: var(--muted); font-weight:600; border-bottom:1px solid var(--grid); padding:10px 8px; }
+    tbody td { border-bottom:1px solid var(--grid); padding:10px 8px; color:#d5d9e0; }
+
+    /* Barras horizontais */
+    .bars { display: grid; gap: 10px; }
+    .bar { display:flex; align-items:center; gap: 10px; }
+    .bar .label { width: 45%; color: var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .bar .track { flex:1; height: 12px; background: #0c1428; border:1px solid #0b1224; border-radius: 999px; overflow:hidden; }
+    .bar .fill { height:100%; display:block; background: var(--amber); }
+    .bar .val { width: 44px; text-align:right; font-variant-numeric: tabular-nums; }
+
+    footer { color: var(--muted); font-size: 11px; }
+    a { color: #93c5fd; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <!-- Nota: mockup estático para "Web Content" no GoodData Classic. Atualize os valores no bloco <script> abaixo. -->
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Internações e Reinternações — Visão Executiva</h1>
+        <div class="sub">Período: Jan/2022 – Ago/2025 • Base simulada para protótipo</div>
+      </div>
+    </header>
+
+    <!-- KPIs -->
+    <section class="kpis">
+      <div class="card kpi">
+        <div class="title">Internações</div>
+        <div class="value"><span id="kpi-internacoes">31.978</span></div>
+        <svg class="spark" id="spark-int" viewBox="0 0 100 30"></svg>
+      </div>
+      <div class="card kpi">
+        <div class="title">Reinternações</div>
+        <div class="value"><span id="kpi-reint">2.412</span></div>
+        <svg class="spark" id="spark-reint" viewBox="0 0 100 30"></svg>
+      </div>
+      <div class="card kpi">
+        <div class="title">% Reinternação</div>
+        <div class="value">
+          <span id="kpi-perc" style="color:#b7f7c8">8%</span>
+          <span id="badge-perc" class="badge ok">Meta &lt; 10%</span>
+        </div>
+        <svg class="spark" id="spark-perc" viewBox="0 0 100 30"></svg>
+      </div>
+    </section>
+
+    <!-- Conteúdo principal: linha + barras -->
+    <section class="grid">
+      <div class="card">
+        <h3>Evolução Mensal</h3>
+        <div class="legend">
+          <span class="dot blue"></span><span>Internações</span>
+          <span class="dot green"></span><span>Reinternações</span>
+          <span class="dot amber"></span><span>% Rein. • meta 10%</span>
+        </div>
+        <svg id="chart-lines" viewBox="0 0 800 340" style="width:100%; height:auto; margin-top:8px; display:block"></svg>
+      </div>
+
+      <div class="card">
+        <h3>% Reinternação por Prestador</h3>
+        <div class="bars" id="bars"></div>
+      </div>
+    </section>
+
+    <!-- Tabela operacional resumida -->
+    <section class="card">
+      <h3>Detalhe Operacional (amostra)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Beneficiário</th>
+            <th>Guia</th>
+            <th>Dt Atendimento</th>
+            <th>Dt Alta</th>
+            <th>Dias Internado</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </section>
+
+    <footer>
+      Mockup estático para guiar o redesign no GoodData Classic (Widget “Web Content”). Documentação: Web Content e Design Lab; métricas e formatação condicional nos links abaixo.
+    </footer>
+  </div>
+
+  <script>
+    // === Dados de exemplo (substitua pelos seus resumos agregados) ===
+    const meses = ["Jan/22","Fev/22","Mar/22","Abr/22","Mai/22","Jun/22","Jul/22","Ago/22","Set/22","Out/22","Nov/22","Dez/22","Jan/23","Fev/23","Mar/23","Abr/23","Mai/23","Jun/23","Jul/23","Ago/23","Set/23","Out/23","Nov/23","Dez/23","Jan/24","Fev/24","Mar/24","Abr/24","Mai/24","Jun/24","Jul/24","Ago/24","Set/24","Out/24","Nov/24","Dez/24","Jan/25","Fev/25","Mar/25","Abr/25","Mai/25","Jun/25","Jul/25","Ago/25"];
+    const internacoes = [699,703,905,809,881,834,868,883,785,789,754,668,735,716,796,710,821,704,775,830,714,724,663,634,659,646,791,807,759,727,700,782,735,812,684,565,681,687,680,736,708,577,626,286];
+    const reinternacoes = [61,59,61,64,51,62,71,58,46,40,53,41,51,57,67,54,48,53,54,40,41,65,57,62,58,70,58,61,55,40,64,73,79,71,50,62,63,67,57,29,30,26,11,11];
+    const perc = reinternacoes.map((r,i)=> Math.round((r / internacoes[i]) * 1000)/10 ); // % com uma casa
+
+    // KPI status
+    const pctAtual = perc[perc.length-1] || 8;
+    const percEl = document.getElementById('kpi-perc');
+    const badge = document.getElementById('badge-perc');
+    if (pctAtual <= 10) { badge.className = 'badge ok'; } else if (pctAtual <= 20) { badge.className='badge warn'; } else { badge.className='badge crit'; }
+
+    // === Funções de desenho SVG ===
+    function scale(arr, minPx, maxPx) {
+      const min = Math.min(...arr), max = Math.max(...arr);
+      const span = max - min || 1;
+      return val => maxPx - ((val - min) / span) * (maxPx - minPx);
+    }
+    function polyline(points, color, width=2, dash='') {
+      const p = points.map(([x,y])=> `${x},${y}`).join(' ');
+      return `<polyline fill="none" stroke="${color}" stroke-width="${width}" points="${p}" ${dash?`stroke-dasharray="${dash}"`:''}/>`;
+    }
+    function renderLines() {
+      const svg = document.getElementById('chart-lines');
+      const W=800, H=340, padL=40, padR=10, padT=16, padB=36;
+      const innerW = W - padL - padR;
+      const innerH = H - padT - padB;
+      const n = meses.length;
+      const xStep = innerW / (n-1);
+
+      const yInt = scale(internacoes, 0, innerH);
+      const yRei = scale(reinternacoes, 0, innerH);
+      const yPct = scale(perc.concat([10]), 0, innerH); // inclui meta 10
+
+      const grid = [];
+      for (let i=0;i<5;i++) {
+        const y = padT + (innerH/4)*i;
+        grid.push(`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="${getComputedStyle(document.body).getPropertyValue('--grid').trim()}" stroke-width="1" />`);
+      }
+
+      const xLabels = meses.map((m,i)=> `<text x="${padL + xStep*i}" y="${H-10}" font-size="10" fill="#9aa4b2" text-anchor="middle">${i%3===0?m:''}</text>`).join('');
+
+      const ptsInt = internacoes.map((v,i)=> [padL + xStep*i, padT + yInt(v)]);
+      const ptsRei = reinternacoes.map((v,i)=> [padL + xStep*i, padT + yRei(v)]);
+      const ptsPct = perc.map((v,i)=> [padL + xStep*i, padT + yPct(v)]);
+
+      // Meta 10%
+      const yMeta = padT + yPct(10);
+      const meta = `<line x1="${padL}" y1="${yMeta}" x2="${W-padR}" y2="${yMeta}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 4" opacity="0.7" />`;
+
+      svg.innerHTML = `
+        ${grid.join('')}
+        ${meta}
+        ${polyline(ptsInt, getComputedStyle(document.body).getPropertyValue('--blue').trim(), 2)}
+        ${polyline(ptsRei, getComputedStyle(document.body).getPropertyValue('--green').trim(), 2)}
+        ${polyline(ptsPct, getComputedStyle(document.body).getPropertyValue('--amber').trim(), 2)}
+        ${xLabels}
+      `;
+    }
+
+    function renderSparks() {
+      function draw(elId, arr, color) {
+        const el = document.getElementById(elId);
+        const W=100,H=30,pad=3; const innerH = H-2*pad; const innerW=W-2*pad;
+        const y = scale(arr, 0, innerH);
+        const xStep = innerW/(arr.length-1);
+        const pts = arr.map((v,i)=> [pad + xStep*i, pad + y(v)]);
+        el.innerHTML = polyline(pts, color, 1.6);
+      }
+      draw('spark-int', internacoes.slice(-24), getComputedStyle(document.body).getPropertyValue('--blue').trim());
+      draw('spark-reint', reinternacoes.slice(-24), getComputedStyle(document.body).getPropertyValue('--green').trim());
+      draw('spark-perc', perc.slice(-24), getComputedStyle(document.body).getPropertyValue('--amber').trim());
+    }
+
+    function renderBars() {
+      const container = document.getElementById('bars');
+      const prestadores = [
+        { nome: 'Hospital A', pct: 6.4 },
+        { nome: 'Hospital B', pct: 7.8 },
+        { nome: 'Hospital C', pct: 9.9 },
+        { nome: 'Hospital D', pct: 12.2 },
+        { nome: 'Hospital E', pct: 18.0 },
+      ];
+      container.innerHTML = '';
+      prestadores.forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'bar';
+        const label = document.createElement('div'); label.className='label'; label.textContent = p.nome;
+        const track = document.createElement('div'); track.className='track';
+        const fill = document.createElement('span'); fill.className='fill'; fill.style.width = Math.min(p.pct, 100) + '%';
+        // cor conforme faixa
+        if (p.pct <= 10) fill.style.background = 'var(--ok)';
+        else if (p.pct <= 20) fill.style.background = 'var(--warn)';
+        else fill.style.background = 'var(--crit)';
+        track.appendChild(fill);
+        const val = document.createElement('div'); val.className='val'; val.textContent = p.pct.toFixed(1) + '%';
+        row.append(label, track, val);
+        container.appendChild(row);
+      });
+    }
+
+    function renderTable() {
+      const rows = [
+        ['PABLO MIGUEL CALAZANS', '9202299', '25/06/2022', '25/06/2022', '1'],
+        ['TOMOE HARAMI YAMAGUCHI', '1191322', '20/05/2024', '26/05/2024', '6'],
+        ['FABIO OLIVEIRA DOS SANTOS', '8770197', '28/01/2022', '30/01/2022', '2']
+      ];
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = rows.map(r => `<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('');
+    }
+
+    renderLines();
+    renderSparks();
+    renderBars();
+    renderTable();
+  </script>
+
+  <!-- Referências úteis (doc GoodData) -->
+  <div style="max-width:1200px;margin:8px auto 24px;padding:0 24px;color:#9aa4b2;font-size:11px;">
+    <div>• Como usar <strong>Web Content</strong> e o <em>Custom Embed Tool</em> no GoodData Classic. Veja a doc: <a href="https://help.gooddata.com/classic/en/dashboards-and-insights/dashboards/creating-dashboards/dashboard-design-lab/custom-embed-tool/" target="_blank" rel="noopener">link</a>.</div>
+    <div>• Criar/editar dashboards no Classic: <a href="https://help.gooddata.com/classic/en/dashboards-and-insights/dashboards/" target="_blank" rel="noopener">link</a>. Adicionar widget "Web Content": <a href="https://help.gooddata.com/classic/en/data-integration/.../creating-a-dashboard/" target="_blank" rel="noopener">link</a>.</div>
+    <div>• Formatação condicional e número: <a href="https://help.gooddata.com/classic/en/dashboards-and-insights/conditional-number-formatting/" target="_blank" rel="noopener">link</a>.</div>
+    <div>• RUNAVG e funções de janela em MAQL: <a href="https://help.gooddata.com/doc/enterprise/en/dashboards-and-insights/maql-analytical-query-language/maql-expression-reference/granularity-keywords/running-total-functions/" target="_blank" rel="noopener">link</a>.</div>
+  </div>
+</body>
+</html>
